@@ -1,0 +1,1 @@
+{"version":3,"file":"auth.d.ts","sourceRoot":"","sources":["../../src/types/auth.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,SAAS,CAAC;AAGlC,MAAM,WAAW,UAAU;IACzB,EAAE,EAAE,MAAM,CAAC;IACX,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,CAAC,EAAE,MAAM,CAAC;CACf;AAED,MAAM,WAAW,oBAAqB,SAAQ,OAAO;IACnD,IAAI,CAAC,EAAE,UAAU,CAAC;CACnB"}
