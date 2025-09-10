@@ -9,6 +9,8 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   UserCircleIcon,
+  CalendarDaysIcon,
+  ClipboardIcon,
 } from '@heroicons/react/24/outline';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthProvider';
@@ -21,6 +23,8 @@ const navigation = [
   { name: 'Teams', href: '/dashboard/teams', icon: UsersIcon, roles: [UserRole.ADMIN, UserRole.HR] },
   { name: 'My Team', href: '/dashboard/my-team', icon: UsersIcon, roles: [UserRole.MANAGER] },
   { name: 'Attendance', href: '/dashboard/attendance', icon: ChartPieIcon, roles: [UserRole.ADMIN, UserRole.HR, UserRole.MANAGER, UserRole.EMPLOYEE] },
+  { name: 'Leave Management', href: '/dashboard/leaves', icon: CalendarDaysIcon, roles: [UserRole.ADMIN, UserRole.HR, UserRole.MANAGER, UserRole.EMPLOYEE] },
+  { name: 'Internships', href: '/dashboard/internships', icon: ClipboardIcon, roles: [UserRole.ADMIN, UserRole.HR] },
 ];
 
 const userNavigation = [
@@ -34,14 +38,8 @@ function classNames(...classes: string[]) {
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
-
   const filteredNavigation = navigation.filter(item => user && item.roles.includes(user.role));
   
-  // Debug logging
-  console.log('Current user:', user);
-  console.log('User role:', user?.role);
-  console.log('Filtered navigation:', filteredNavigation);
-
   return (
     <>
       <div className="min-h-screen bg-gray-50">

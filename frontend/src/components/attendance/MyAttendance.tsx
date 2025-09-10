@@ -35,10 +35,13 @@ export default function MyAttendance() {
     } catch (err) {
       setError('Check-in failed. Please try again.');
     }
-  };  const handleCheckOut = async () => {
+  };
+  const handleCheckOut = async () => {
     if (!todaysRecord) return;
     try {
-      await api.post(`/attendance/check-out/${todaysRecord._id}`);
+      await api.post('/attendance/check-out', {
+        attendanceId: todaysRecord._id
+      });
       fetchTodaysRecord(); // Refresh data
     } catch (err) {
       setError('Check-out failed. Please try again.');

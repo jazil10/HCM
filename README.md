@@ -1,53 +1,76 @@
-# HCM (Human Capital Management)
+# HCM System - Human Capital Management
 
-A full-stack Human Capital Management (HCM) system with a Node.js/Express backend and a React frontend.
+A comprehensive Human Resources Management System with advanced Internship Management features built with React, TypeScript, Express, and MongoDB.
 
-## Project Structure
+## 🚀 Quick Start
 
+### Prerequisites
+- Node.js (>=16.0.0)
+- npm (>=8.0.0)  
+- MongoDB (local or cloud instance)
+
+### One-Command Setup
+```bash
+# Clone and install everything
+git clone https://github.com/jazil10/HCM.git
+cd HCM
+npm run install:all
+
+# Start both backend and frontend
+npm run dev
 ```
-HCM/
-  backend/    # Express API (TypeScript, MongoDB)
-  frontend/   # React (Vite, TypeScript, Tailwind)
+
+This will start:
+- Backend server on http://localhost:3001
+- Frontend development server on http://localhost:5173
+
+### Environment Setup
+Create `backend/.env` with your configuration:
+```env
+MONGODB_URI=mongodb://localhost:27017/hcm_system
+JWT_SECRET=your-super-secret-jwt-key
+PORT=3001
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
 ```
 
-## Getting Started
+## 📋 Available Commands
 
-### Backend
+### Main Commands
+- `npm run dev` - Start both backend and frontend in development
+- `npm run start` - Start both in production mode  
+- `npm run build` - Build both for production
+- `npm run seed` - Seed database with sample data
+- `npm run migrate` - Run database migrations
 
-1. Navigate to the backend folder:
-   ```sh
-   cd backend
-   ```
-2. Install dependencies:
-   ```sh
-   npm install
-   ```
-3. Create a `.env` file (see `.env.example` if available) and configure your environment variables.
-4. Start the development server:
-   ```sh
-   npm run dev
-   ```
+### Individual Commands  
+- `npm run dev:backend` - Start only backend
+- `npm run dev:frontend` - Start only frontend
+- `npm run install:all` - Install all dependencies
 
-### Frontend
+## ✨ Features
 
-1. Navigate to the frontend folder:
-   ```sh
-   cd frontend
-   ```
-2. Install dependencies:
-   ```sh
-   npm install
-   ```
-3. Start the development server:
-   ```sh
-   npm run dev
-   ```
+### Core HR Features
+- **Employee Management** - Add, edit, and manage employee records
+- **Team Management** - Organize employees into teams with managers  
+- **Attendance Tracking** - Monitor employee attendance and work hours
+- **Leave Management** - Handle leave requests, approvals, and balance tracking
+- **Dashboard & Analytics** - Comprehensive insights into HR metrics
 
-## Features
-- User authentication (Admin, HR, Manager, Employee)
-- Employee and team management
-- Attendance tracking
-- Role-based access control
+### 🎓 Internship Management System
+- **Program Creation** - HR/Admin can create detailed internship programs
+- **Public Application Forms** - Students can apply through public URLs
+- **Application Review** - Comprehensive dashboard to review applications
+- **Status Tracking** - Track applications through various stages
+- **Communication** - Email notifications and internal notes
+- **File Management** - Resume uploads and document handling
+
+## 🛠 Tech Stack
+
+**Backend:** Node.js, Express, TypeScript, MongoDB, JWT, Multer, Nodemailer  
+**Frontend:** React 18, TypeScript, Vite, React Router, Tailwind CSS, Headless UI
 - Modern UI with React and Tailwind CSS
 
 ## Contributing

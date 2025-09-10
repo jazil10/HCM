@@ -4,6 +4,7 @@ import User, { UserRole } from './models/User';
 import Team from './models/Team';
 import Employee from './models/Employee';
 import Attendance from './models/Attendance';
+import InternshipProgram, { ProgramStatus } from './models/InternshipProgram';
 
 dotenv.config();
 
@@ -76,8 +77,108 @@ async function seed() {
       status: 'present',
       checkIn: new Date('2025-06-19T09:05:00'),
       checkOut: new Date('2025-06-19T17:00:00')
+    }  ]);
+
+  // Create internship programs
+  const internshipProgram1 = new InternshipProgram({
+    title: 'Software Engineering Internship - Summer 2025',
+    description: 'Join our engineering team for a 3-month internship where you will work on real projects using modern technologies like React, Node.js, and MongoDB. You will be mentored by senior developers and contribute to our production applications.',
+    department: 'Engineering',
+    location: 'New York, NY',
+    duration: 3,
+    startDate: new Date('2025-07-01'),
+    endDate: new Date('2025-09-30'),
+    applicationDeadline: new Date('2025-06-30'),
+    maxApplicants: 5,
+    currentApplicants: 0,
+    requirements: [
+      'Currently enrolled in Computer Science or related field',
+      'Knowledge of JavaScript and web development',
+      'Strong problem-solving skills',
+      'Excellent communication skills'
+    ],
+    skills: ['JavaScript', 'React', 'Node.js', 'Git', 'MongoDB'],
+    benefits: [
+      'Competitive stipend',
+      'Mentorship program',
+      'Flexible work hours',
+      'Learning budget',
+      'Potential for full-time offer'
+    ],
+    stipend: 4000,
+    isRemote: false,
+    status: ProgramStatus.ACTIVE,
+    createdBy: hr._id,
+    publicSlug: 'software-engineering-summer-2025',
+    applicationForm: {
+      requiredFields: ['name', 'email', 'phone', 'university', 'major', 'graduationYear'],
+      optionalFields: ['gpa', 'portfolio', 'linkedIn', 'github'],
+      customQuestions: [
+        {
+          question: 'Why are you interested in this internship?',
+          type: 'textarea',
+          required: true
+        },
+        {
+          question: 'What programming languages are you most comfortable with?',
+          type: 'checkbox',
+          options: ['JavaScript', 'Python', 'Java', 'C++', 'C#', 'React', 'Angular', 'Vue.js'],
+          required: true
+        }
+      ]
     }
-  ]);
+  });
+
+  const internshipProgram2 = new InternshipProgram({
+    title: 'HR Analytics Internship - Fall 2025',
+    description: 'Work with our HR team to analyze employee data, create reports, and help improve our people processes. You will gain experience in data analysis, HR metrics, and organizational psychology.',
+    department: 'Human Resources',
+    location: 'Remote',
+    duration: 4,
+    startDate: new Date('2025-09-01'),
+    endDate: new Date('2025-12-31'),
+    applicationDeadline: new Date('2025-08-15'),
+    maxApplicants: 2,
+    currentApplicants: 0,
+    requirements: [
+      'Currently enrolled in HR, Psychology, or Business Administration',
+      'Interest in data analysis and HR metrics',
+      'Proficiency in Excel or Google Sheets',
+      'Strong analytical skills'
+    ],
+    skills: ['Excel', 'Data Analysis', 'HR Metrics', 'Communication', 'Research'],
+    benefits: [
+      'Remote work opportunity',
+      'HR professional development',
+      'Networking opportunities',
+      'Certificate of completion'
+    ],
+    stipend: 3000,
+    isRemote: true,
+    status: ProgramStatus.ACTIVE,
+    createdBy: hr._id,
+    publicSlug: 'hr-analytics-fall-2025',
+    applicationForm: {
+      requiredFields: ['name', 'email', 'phone', 'university', 'major', 'graduationYear', 'gpa'],
+      optionalFields: ['linkedIn'],
+      customQuestions: [
+        {
+          question: 'Do you have any experience with data analysis tools?',
+          type: 'radio',
+          options: ['Yes, extensive experience', 'Some experience', 'No experience but willing to learn'],
+          required: true
+        },
+        {
+          question: 'What interests you most about HR analytics?',
+          type: 'textarea',
+          required: true
+        }
+      ]
+    }
+  });
+
+  await internshipProgram1.save();
+  await internshipProgram2.save();
 
   console.log('Dummy data inserted!');
   await mongoose.disconnect();

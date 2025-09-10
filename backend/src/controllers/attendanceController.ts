@@ -4,23 +4,16 @@ import { AuthenticatedRequest } from '../types/auth';
 import mongoose from 'mongoose';
 import Team from '../models/Team';
 import Employee from '../models/Employee';
-import User from '../models/User';
 
 const getStartOfDay = (date: Date) => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 };
 
 export const checkIn = async (req: AuthenticatedRequest, res: Response) => {
-  // Find the Employee document for the logged-in user
-  const userId = req.user?.id;
-  if (!userId || req.user?.role === 'admin') {
+  const employeeId = req.user?.employeeId;
+  if (!employeeId || employeeId === 'admin_user') {
     return res.status(400).json({ message: 'This user is not a registered employee and cannot check in.' });
   }
-  const employee = await Employee.findOne({ user: userId });
-  if (!employee) {
-    return res.status(400).json({ message: 'No employee profile found for this user.' });
-  }
-  const employeeId = employee._id;
 
   const today = getStartOfDay(new Date());
 
@@ -33,17 +26,11 @@ export const checkIn = async (req: AuthenticatedRequest, res: Response) => {
     return res.status(400).json({ message: 'You have already checked in today.' });
   }
 
-  const checkInTime = new Date();
-  // Determine if check-in is late (after 11:00 AM)
-  const cutoffTime = new Date();
-  cutoffTime.setHours(11, 0, 0, 0); // 11:00 AM today
-  const status = checkInTime > cutoffTime ? 'late' : 'present';
-
   const attendance = await Attendance.findOneAndUpdate(
     { employee: employeeId, date: today },
     { 
-      checkIn: checkInTime,
-      status: status,
+      checkIn: new Date(),
+      status: 'present',
       employee: employeeId,
       date: today
     },
@@ -55,15 +42,11 @@ export const checkIn = async (req: AuthenticatedRequest, res: Response) => {
 
 export const checkOut = async (req: AuthenticatedRequest, res: Response) => {
   const { id: attendanceId } = req.params;
-  const userId = req.user?.id;
-  if (!userId) {
+  const { employeeId } = req.user || {};
+
+  if (employeeId === undefined) {
     return res.status(400).json({ message: 'User has no valid employee ID.' });
   }
-  const employee = await Employee.findOne({ user: userId });
-  if (!employee) {
-    return res.status(400).json({ message: 'No employee profile found for this user.' });
-  }
-  const employeeId = employee._id;
 
   if (!attendanceId || !mongoose.Types.ObjectId.isValid(attendanceId)) {
     return res.status(400).json({ message: 'Invalid attendance ID.' });
@@ -75,47 +58,41 @@ export const checkOut = async (req: AuthenticatedRequest, res: Response) => {
     return res.status(404).json({ message: 'Attendance record not found or you are not authorized.' });
   }
 
+  if (attendance.checkOut) {
+    return res.status(400).json({ message: 'You have already checked out today.' });
+  }
+
   if (!attendance.checkIn) {
     return res.status(400).json({ message: 'You must check in before checking out.' });
   }
 
-  // Allow multiple checkouts - update to the most recent checkout time
   attendance.checkOut = new Date();
 
-  // Calculate total working hours
   const diffMs = attendance.checkOut.getTime() - attendance.checkIn.getTime();
   attendance.totalHours = diffMs / (1000 * 60 * 60);
-  // Determine if check-in was late (after 11:00 AM) to preserve status
-  const checkInTimeOnRecord = new Date(attendance.checkIn);
-  const cutoffTimeOnRecord = new Date(checkInTimeOnRecord);
-  cutoffTimeOnRecord.setHours(11, 0, 0, 0); // 11:00 AM on the same day
-  if (checkInTimeOnRecord > cutoffTimeOnRecord) {
-    attendance.status = 'late';
-  } else {
-    attendance.status = 'present';
-  }
+  
   await attendance.save();
+
   return res.status(200).json(attendance);
 };
 
 export const getTodaysAttendance = async (req: AuthenticatedRequest, res: Response) => {
-  const userId = req.user?.id;
-  if (!userId || req.user?.role === 'admin') {
+  const employeeId = req.user?.employeeId;
+  if (!employeeId || employeeId === 'admin_user') {
     return res.status(404).json(null);
   }
-  const employee = await Employee.findOne({ user: userId });
-  if (!employee) {
-    return res.status(404).json(null);
-  }
-  const employeeId = employee._id;
+  
   const today = getStartOfDay(new Date());
+
   const attendance = await Attendance.findOne({
     employee: employeeId,
     date: today,
   });
+
   if (!attendance) {
     return res.status(404).json(null);
   }
+
   return res.status(200).json(attendance);
 };
 
@@ -227,38 +204,32 @@ export const createOrUpdateAttendance = async (req: Request, res: Response) => {
 };
 
 export const getTeamAttendance = async (req: AuthenticatedRequest, res: Response) => {
-  const userId = req.user?.id;
-  if (!userId) {
-    return res.status(401).json({ message: 'Not authorized' });
+  const managerId = req.user?.id;
+  
+  // Find the manager's team
+  const team = await Team.findOne({ manager: managerId });
+  if (!team) {
+    return res.status(404).json({ message: "You are not assigned as a manager to any team." });
   }
-  // First, find the logged-in user to identify their team
-  const user = await User.findById(userId);
-  if (!user || !user.team) {
-    return res.status(404).json({ message: 'You are not assigned to a team.' });
-  }
-  // Now that we have the team ID, find all employees in that team
-  const teamId = user.team;
-  const teamMembers = await Employee.find({ team: teamId });
+
+  // Find employees in that team
+  const teamMembers = await Employee.find({ team: team._id }).select('_id');
   const teamMemberIds = teamMembers.map(member => member._id);
-  // Support optional date query param
-  let targetDate: Date;
-  if (req.query.date) {
-    targetDate = getStartOfDay(new Date(req.query.date as string));
-  } else {
-    targetDate = getStartOfDay(new Date());
-  }
-  // Find attendance records for those employees for the target date
+  
+  const today = getStartOfDay(new Date());
+
+  // Find attendance records for today for those employees
   const attendance = await Attendance.find({
     employee: { $in: teamMemberIds },
-    date: targetDate
+    date: today
   }).populate({
     path: 'employee',
     populate: {
       path: 'user',
       model: 'User',
-      select: 'name email role'
+      select: 'name'
     }
   });
+
   return res.status(200).json(attendance);
 };
-

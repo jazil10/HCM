@@ -29,15 +29,18 @@ export default function EmployeesPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const { user } = useAuth();
-
   const fetchEmployees = async () => {
     try {
       setLoading(true);
+      console.log('Fetching employees...');
       const response = await api.get('/employees');
+      console.log('Employees response:', response.data);
       setEmployees(response.data.employees);
-    } catch (err) {
-      setError('Failed to fetch employees.');
-      console.error(err);
+    } catch (err: any) {
+      console.error('Error fetching employees:', err);
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      setError(`Failed to fetch employees: ${err.response?.data?.message || err.message}`);
     } finally {
       setLoading(false);
     }
