@@ -7,6 +7,7 @@ import { UserRole } from '../types/auth';
 import { useAuth } from '../contexts/AuthProvider';
 import CreateTeamModal from '../components/teams/CreateTeamModal';
 import EditTeamModal from '../components/teams/EditTeamModal';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 function AccessDenied() {
   return (
@@ -27,6 +28,8 @@ export default function TeamsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const { user } = useAuth();
+  
+  usePageTitle('Teams');
 
   const fetchTeams = async () => {
     try {

@@ -21,6 +21,8 @@ interface DashboardStats {
   presentToday: number;
   absentToday: number;
   totalTeams: number;
+  pendingApplications: number;
+  totalInternships: number;
 }
 
 interface RecentActivity {
@@ -46,7 +48,9 @@ export default function DashboardPage() {
     totalEmployees: 0,
     presentToday: 0,
     absentToday: 0,
-    totalTeams: 0
+    totalTeams: 0,
+    pendingApplications: 0,
+    totalInternships: 0
   });
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -170,13 +174,15 @@ export default function DashboardPage() {
         const promises = [
           api.get('/employees'),
           api.get('/teams'),
+          api.get('/internship-programs'),
           api.get('/internship-applications')
         ];
 
-        const [employeesRes, teamsRes, applicationsRes] = await Promise.all(promises);
+        const [employeesRes, teamsRes, internshipsRes, applicationsRes] = await Promise.all(promises);
         
         const employees = employeesRes.data || [];
         const teams = teamsRes.data || [];
+        const internships = internshipsRes.data || [];
         const applications = applicationsRes.data || [];
         
         // Calculate present/absent (mock calculation based on current time)
@@ -189,6 +195,8 @@ export default function DashboardPage() {
           presentToday: presentCount,
           absentToday: employees.length - presentCount,
           totalTeams: teams.length,
+          pendingApplications: applications.filter((app: any) => app.status === 'pending').length,
+          totalInternships: internships.length,
         });
 
         // Generate recent activities
@@ -225,6 +233,8 @@ export default function DashboardPage() {
           presentToday: 10,
           absentToday: 2,
           totalTeams: 4,
+          pendingApplications: 3,
+          totalInternships: 2,
         });
         
         // Mock recent activities for demo
@@ -295,13 +305,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
               <UsersIcon className="h-6 w-6 text-blue-600" />
             </div>
-            <div className="ml-4 min-w-0 flex-1">
+            <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Employees</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalEmployees}</p>
             </div>
@@ -313,7 +323,7 @@ export default function DashboardPage() {
             <div className="p-2 bg-green-100 rounded-lg">
               <CheckCircleIcon className="h-6 w-6 text-green-600" />
             </div>
-            <div className="ml-4 min-w-0 flex-1">
+            <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Present Today</p>
               <p className="text-2xl font-bold text-gray-900">{stats.presentToday}</p>
             </div>
@@ -325,7 +335,7 @@ export default function DashboardPage() {
             <div className="p-2 bg-red-100 rounded-lg">
               <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
             </div>
-            <div className="ml-4 min-w-0 flex-1">
+            <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Absent Today</p>
               <p className="text-2xl font-bold text-gray-900">{stats.absentToday}</p>
             </div>
@@ -337,9 +347,33 @@ export default function DashboardPage() {
             <div className="p-2 bg-purple-100 rounded-lg">
               <BuildingOfficeIcon className="h-6 w-6 text-purple-600" />
             </div>
-            <div className="ml-4 min-w-0 flex-1">
+            <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Teams</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalTeams}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <ClockIcon className="h-6 w-6 text-orange-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Pending Applications</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.pendingApplications}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-indigo-100 rounded-lg">
+              <CalendarDaysIcon className="h-6 w-6 text-indigo-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Internship Programs</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalInternships}</p>
             </div>
           </div>
         </div>

@@ -222,97 +222,106 @@ const InternshipProgramsPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPrograms.map((program) => (
-            <div key={program._id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                      {program.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{program.department}</p>
-                  </div>
+            <div key={program._id} className="card p-6 hover:shadow-lg transition-shadow duration-200">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                    {program.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 truncate">{program.department}</p>
+                </div>
+                <div className="flex-shrink-0 ml-3">
                   {getStatusBadge(program.status)}
                 </div>
+              </div>
 
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPinIcon className="h-4 w-4 mr-2" />
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center text-sm text-gray-600">
+                  <MapPinIcon className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span className="truncate">
                     {program.location} {program.isRemote && '(Remote)'}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <CalendarIcon className="h-4 w-4 mr-2" />
-                    {program.duration} months
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <UserGroupIcon className="h-4 w-4 mr-2" />
-                    {program.currentApplicants}/{program.maxApplicants} applicants
-                  </div>
+                  </span>
                 </div>
-
-                <div className="mb-4">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full" 
-                      style={{ 
-                        width: `${Math.min((program.currentApplicants / program.maxApplicants) * 100, 100)}%` 
-                      }}
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Applications: {program.currentApplicants}/{program.maxApplicants}
-                  </p>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CalendarIcon className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span>{program.duration} months</span>
                 </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <UserGroupIcon className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span>{program.currentApplicants}/{program.maxApplicants} applicants</span>
+                </div>
+              </div>
 
-                <div className="text-sm text-gray-600 mb-4">
-                  <p><strong>Deadline:</strong> {new Date(program.applicationDeadline).toLocaleDateString()}</p>
-                  {program.stipend && (
-                    <p><strong>Stipend:</strong> ${program.stipend}/month</p>
+              <div className="mb-4">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full" 
+                    style={{ 
+                      width: `${Math.min((program.currentApplicants / program.maxApplicants) * 100, 100)}%` 
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Applications: {program.currentApplicants}/{program.maxApplicants}
+                </p>
+              </div>
+
+              <div className="text-sm text-gray-600 mb-4 space-y-1">
+                <div>
+                  <span className="font-medium">Deadline:</span>{' '}
+                  <span>{new Date(program.applicationDeadline).toLocaleDateString()}</span>
+                </div>
+                {program.stipend && (
+                  <div>
+                    <span className="font-medium">Stipend:</span>{' '}
+                    <span>${program.stipend}/month</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                {/* Action Buttons */}
+                <div className="flex space-x-2">
+                  <Link
+                    to={`/dashboard/internships/programs/${program._id}`}
+                    className="btn-secondary flex-1 text-xs py-2 flex items-center justify-center"
+                  >
+                    <EyeIcon className="h-3 w-3 mr-1" />
+                    View
+                  </Link>
+                  <Link
+                    to={`/dashboard/internships/programs/${program._id}/edit`}
+                    className="btn-primary flex-1 text-xs py-2 flex items-center justify-center"
+                  >
+                    <PencilIcon className="h-3 w-3 mr-1" />
+                    Edit
+                  </Link>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <Link
+                    to={`/dashboard/internships/applications?program=${program._id}`}
+                    className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-blue-300 shadow-sm text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                  >
+                    <ClipboardIcon className="h-3 w-3 mr-1" />
+                    Applications
+                  </Link>
+                  {user.role === UserRole.ADMIN && (
+                    <button
+                      onClick={() => handleDelete(program._id)}
+                      className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-red-300 shadow-sm text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
+                    >
+                      <TrashIcon className="h-3 w-3 mr-1" />
+                      Delete
+                    </button>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <div className="flex space-x-2">
-                    <Link
-                      to={`/dashboard/internships/programs/${program._id}`}
-                      className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      <EyeIcon className="h-4 w-4 mr-1" />
-                      View
-                    </Link>
-                    <Link
-                      to={`/dashboard/internships/programs/${program._id}/edit`}
-                      className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      <PencilIcon className="h-4 w-4 mr-1" />
-                      Edit
-                    </Link>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <Link
-                      to={`/dashboard/internships/applications?program=${program._id}`}
-                      className="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100"
-                    >
-                      <ClipboardIcon className="h-4 w-4 mr-1" />
-                      Applications
-                    </Link>
-                    {user.role === UserRole.ADMIN && (
-                      <button
-                        onClick={() => handleDelete(program._id)}
-                        className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100"
-                      >
-                        <TrashIcon className="h-4 w-4 mr-1" />
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </div>
-
                 {/* Public Link */}
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <p className="text-xs text-gray-500 mb-1">Public Application URL:</p>
-                  <div className="flex items-center">
-                    <code className="text-xs bg-gray-100 px-2 py-1 rounded flex-1 truncate">
+                <div className="pt-3 border-t border-gray-200">
+                  <p className="text-xs font-medium text-gray-500 mb-2">Public Application URL:</p>
+                  <div className="flex items-center space-x-2">
+                    <code className="text-xs bg-gray-100 px-2 py-1 rounded flex-1 truncate min-w-0">
                       {window.location.origin}/apply/{program.publicSlug}
                     </code>
                     <button
@@ -320,7 +329,7 @@ const InternshipProgramsPage: React.FC = () => {
                         navigator.clipboard.writeText(`${window.location.origin}/apply/${program.publicSlug}`);
                         alert('URL copied to clipboard!');
                       }}
-                      className="ml-2 text-xs text-blue-600 hover:text-blue-800"
+                      className="flex-shrink-0 text-xs text-blue-600 hover:text-blue-800 font-medium"
                     >
                       Copy
                     </button>

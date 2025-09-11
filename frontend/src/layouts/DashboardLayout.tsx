@@ -28,7 +28,7 @@ const navigation = [
 ];
 
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
+  { name: 'Your Profile', href: '/dashboard/my-profile' },
 ];
 
 function classNames(...classes: string[]) {
@@ -102,6 +102,7 @@ export default function DashboardLayout() {
                               <li key={item.name}>
                                 <NavLink
                                   to={item.href}
+                                  end={item.href === '/dashboard'}
                                   className={({ isActive }) =>
                                     classNames(
                                       isActive
@@ -156,6 +157,7 @@ export default function DashboardLayout() {
                       <li key={item.name}>
                         <NavLink
                           to={item.href}
+                          end={item.href === '/dashboard'}
                           className={({ isActive }) =>
                             classNames(
                               isActive
@@ -235,15 +237,15 @@ export default function DashboardLayout() {
                       {userNavigation.map((item) => (
                         <Menu.Item key={item.name}>
                           {({ active }) => (
-                            <a
-                              href={item.href}
+                            <NavLink
+                              to={item.href}
                               className={classNames(
                                 active ? 'bg-gray-50' : '',
-                                'block px-3 py-1 text-sm leading-6 text-gray-900'
+                                'block px-3 py-1 text-sm leading-6 text-gray-900 hover:bg-gray-50'
                               )}
                             >
                               {item.name}
-                            </a>
+                            </NavLink>
                           )}
                         </Menu.Item>
                       ))}
